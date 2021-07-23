@@ -28,5 +28,6 @@ API -> MS: Registra dados da entrega
 MS->API: Confirma atualizacao do registro
 API -->Mailer: Confirma a finalização do serviço
 ```
-  
+</details>
+
   ![image](https://user-images.githubusercontent.com/4924002/126730780-80b2db6b-7689-4682-b0b7-1029209e7a2b.png)
