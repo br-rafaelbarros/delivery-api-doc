@@ -1,0 +1,661 @@
+{
+  "openapi":"3.0.0",
+  "servers":[
+    {
+      "url":"http://delivery-api.com",
+      "description":"Production"
+    },
+    {
+      "url":"http://sandbox.delivery-api.com",
+      "description":"Sandbox"
+    }
+  ],
+  "info":{
+    "version":"1.0.0",
+    "title":"Delivery API",
+    "description":"Simple delivery manager",
+    "termsOfService":"http://localhost:8080/terms/",
+    "license":{
+      "name":"Apache 2.0",
+      "url":"https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "paths":{
+    "/product":{
+      "post":{
+        "tags":[
+          "v1/seller"
+        ],
+        "summary":"Add product to delivery",
+        "description":"Use to request to make available product",
+        "operationId":"addProduct",
+        "responses":{
+          "405":{
+            "description":"Invalid input"
+          }
+        },
+        "security":[
+          {
+            "delivery_auth":[
+              "write:product",
+              "read:deliveryPack"
+            ]
+          }
+        ],
+        "requestBody":{
+          "$ref":"#/components/requestBodies/Product"
+        }
+      },
+      "put":{
+        "tags":[
+          "v1/seller"
+        ],
+        "summary":"Update registry of products",
+        "description":"Use to update products",
+        "operationId":"updateProduct",
+        "responses":{
+          "400":{
+            "description":"Invalid ID supplied"
+          },
+          "404":{
+            "description":"Product not found"
+          },
+          "405":{
+            "description":"Validation exception"
+          }
+        },
+        "security":[
+          {
+            "delivery_auth":[
+              "write:product",
+              "read:product"
+            ]
+          }
+        ],
+        "requestBody":{
+          "$ref":"#/components/requestBodies/Product"
+        }
+      },
+      "delete":{
+        "tags":[
+          "v1/seller"
+        ],
+        "summary":"Delete a product",
+        "description":"use to delete a product",
+        "operationId":"deleteProduct",
+        "parameters":[
+          {
+            "name":"api_key",
+            "in":"header",
+            "description":"",
+            "required":false,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "400":{
+            "description":"Invalid product value"
+          }
+        },
+        "security":[
+          {
+            "delivery_auth":[
+              "write:product",
+              "read:product"
+            ]
+          }
+        ]
+      }
+    },
+    "/product/findByStatus":{
+      "get":{
+        "tags":[
+          "v1/seller"
+        ],
+        "summary":"Finds Product by status",
+        "description":"Multiple status values can be provided with comma separated strings",
+        "operationId":"findProductByStatus",
+        "parameters":[
+          {
+            "name":"status",
+            "in":"query",
+            "description":"Status values that need to be considered for filter",
+            "required":true,
+            "explode":true,
+            "schema":{
+              "type":"array",
+              "items":{
+                "type":"string",
+                "enum":[
+                  "available",
+                  "onCourse",
+                  "delivered"
+                ]
+              },
+              "default":[
+                "available"
+              ]
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"successful operation",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type":"array",
+                  "items":{
+                    "$ref":"#/components/schemas/Product"
+                  }
+                },
+                "examples":{
+                  "response":{
+                    "value":{
+                      "name":"Pack1",
+                      "type":"box",
+                      "color":"none",
+                      "size":"1m x 1m"
+                    }
+                  }
+                }
+              },
+              "application/xml":{
+                "schema":{
+                  "type":"array",
+                  "items":{
+                    "$ref":"#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Invalid status value"
+          }
+        },
+        "security":[
+          {
+            "delivery_auth":[
+              "write:product",
+              "read:product"
+            ]
+          }
+        ]
+      }
+    },
+    "/product/{productId}":{
+      "get":{
+        "tags":[
+          "v1/seller"
+        ],
+        "summary":"Find product by ID",
+        "description":"Returns a product by ID",
+        "operationId":"getProductById",
+        "parameters":[
+          {
+            "name":"productId",
+            "in":"path",
+            "description":"ID of product that needs to be fetched",
+            "required":true,
+            "schema":{
+              "type":"integer"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"successful operation",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/Product"
+                }
+              },
+              "application/xml":{
+                "schema":{
+                  "$ref":"#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Invalid ID supplied"
+          },
+          "404":{
+            "description":"Product not found"
+          }
+        },
+        "security":[
+          {
+            "api_key":[
+              
+            ]
+          },
+          {
+            "delivery_auth":[
+              "write:product",
+              "read:product"
+            ]
+          }
+        ]
+      }
+    },
+    "/user":{
+      "post":{
+        "tags":[
+          "user"
+        ],
+        "summary":"Create user",
+        "description":"This can only be done by the logged in user.",
+        "operationId":"createUser",
+        "responses":{
+          "default":{
+            "description":"successful operation"
+          }
+        },
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/User"
+              }
+            }
+          },
+          "description":"Created user object"
+        }
+      }
+    },
+    "/user/login":{
+      "get":{
+        "tags":[
+          "user"
+        ],
+        "summary":"Logs user into the system",
+        "description":"",
+        "operationId":"loginUser",
+        "parameters":[
+          {
+            "name":"username",
+            "in":"query",
+            "description":"The user name for login",
+            "required":false,
+            "schema":{
+              "type":"string"
+            }
+          },
+          {
+            "name":"password",
+            "in":"query",
+            "description":"The password for login in clear text",
+            "required":false,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"successful operation",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type":"string"
+                }
+              },
+              "application/xml":{
+                "schema":{
+                  "type":"string"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Invalid username/password supplied"
+          }
+        }
+      }
+    },
+    "/user/logout":{
+      "get":{
+        "tags":[
+          "user"
+        ],
+        "summary":"Logs out current logged in user session",
+        "description":"",
+        "operationId":"logoutUser",
+        "responses":{
+          "default":{
+            "description":"successful operation"
+          }
+        }
+      }
+    },
+    "/user/{username}":{
+      "get":{
+        "tags":[
+          "user"
+        ],
+        "summary":"Get user by user name",
+        "description":"",
+        "operationId":"getUserByName",
+        "parameters":[
+          {
+            "name":"username",
+            "in":"path",
+            "description":"The name that needs to be fetched. Use user1 for testing. ",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "200":{
+            "description":"successful operation",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/User"
+                }
+              },
+              "application/xml":{
+                "schema":{
+                  "$ref":"#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400":{
+            "description":"Invalid username supplied"
+          },
+          "404":{
+            "description":"User not found"
+          }
+        }
+      },
+      "put":{
+        "tags":[
+          "user"
+        ],
+        "summary":"Updated user",
+        "description":"This can only be done by the logged in user.",
+        "operationId":"updateUser",
+        "parameters":[
+          {
+            "name":"username",
+            "in":"path",
+            "description":"name that need to be deleted",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "400":{
+            "description":"Invalid user supplied"
+          },
+          "404":{
+            "description":"User not found"
+          }
+        },
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref":"#/components/schemas/User"
+              }
+            }
+          },
+          "description":"Updated user object"
+        }
+      },
+      "delete":{
+        "tags":[
+          "user"
+        ],
+        "summary":"Delete user",
+        "description":"This can only be done by the logged in user.",
+        "operationId":"deleteUser",
+        "parameters":[
+          {
+            "name":"username",
+            "in":"path",
+            "description":"The name that needs to be deleted",
+            "required":true,
+            "schema":{
+              "type":"string"
+            }
+          }
+        ],
+        "responses":{
+          "400":{
+            "description":"Invalid username supplied"
+          },
+          "404":{
+            "description":"User not found"
+          }
+        }
+      }
+    }
+  },
+  "components":{
+    "requestBodies":{
+      "Product":{
+        "content":{
+          "application/json":{
+            "schema":{
+              "type":"array",
+              "items":{
+                "$ref":"#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "description":"List of user object"
+      },
+      "UserArray":{
+        "content":{
+          "application/json":{
+            "schema":{
+              "type":"array",
+              "items":{
+                "$ref":"#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "description":"List of user object"
+      },
+      "Pet":{
+        "content":{
+          "application/json":{
+            "schema":{
+              "$ref":"#/components/schemas/Product"
+            }
+          },
+          "application/xml":{
+            "schema":{
+              "$ref":"#/components/schemas/Product"
+            }
+          }
+        },
+        "description":"Pet object that needs to be added to the store"
+      }
+    },
+    "securitySchemes":{
+      "api_key":{
+        "type":"apiKey",
+        "name":"api_key",
+        "in":"header"
+      },
+      "delivery_auth":{
+        "type":"oauth2",
+        "flows":{
+          "implicit":{
+            "authorizationUrl":"http://producttore.swagger.io/api/oauth/dialog",
+            "scopes":{
+              "write:product":"modify product in your account",
+              "write:deliveryPack":"modify pack in your account",
+              "write:address":"modify address in your account",
+              "read:deliveryPack":"read your pack",
+              "read:product":"read your products"
+            }
+          }
+        }
+      }
+    },
+    "schemas":{
+      "User":{
+        "properties":{
+          "id":{
+            "type":"integer",
+            "format":"int64"
+          },
+          "username":{
+            "type":"string"
+          },
+          "firstName":{
+            "type":"string"
+          },
+          "lastName":{
+            "type":"string"
+          },
+          "email":{
+            "type":"string"
+          },
+          "password":{
+            "type":"string"
+          },
+          "phone":{
+            "type":"string"
+          },
+          "userStatus":{
+            "type":"string",
+            "description":"User Status",
+            "enum":[
+              "active",
+              "unactive"
+            ]
+          },
+          "role":{
+            "type":"string",
+            "description":"User Status",
+            "enum":[
+              "seller",
+              "postman",
+              "aministrator"
+            ]
+          }
+        }
+      },
+      "Product":{
+        "required":[
+          "name"
+        ],
+        "properties":{
+          "id":{
+            "type":"integer"
+          },
+          "category":{
+            "$ref":"#/components/schemas/Category"
+          },
+          "nickName":{
+            "type":"string",
+            "example":"promo1"
+          },
+          "name":{
+            "type":"string",
+            "example":"smartphone"
+          },
+          "photoUrls":{
+            "type":"array",
+            "items":{
+              "type":"string"
+            }
+          },
+          "status":{
+            "type":"string",
+            "description":"pet status in the store",
+            "enum":[
+              "available",
+              "onCourse",
+              "delivered"
+            ]
+          }
+        }
+      },
+      "Address":{
+        "properties":{
+          "id":{
+            "type":"integer"
+          },
+          "address1":{
+            "type":"string"
+          },
+          "detail":{
+            "type":"string"
+          },
+          "postalCode":{
+            "type":"string"
+          }
+        }
+      },
+      "Category":{
+        "properties":{
+          "id":{
+            "type":"integer"
+          },
+          "name":{
+            "type":"string"
+          },
+          "description":{
+            "type":"string"
+          }
+        }
+      },
+      "DeliveryPack":{
+        "required":[
+          "name",
+          "address",
+          "products"
+        ],
+        "properties":{
+          "id":{
+            "type":"integer"
+          },
+          "address":{
+            "$ref":"#/components/schemas/Address"
+          },
+          "products":{
+            "type":"array",
+            "$ref":"#/components/schemas/Product"
+          },
+          "searchCode":{
+            "type":"string",
+            "example":"DUFVNSDVSDV4543V21S3V"
+          },
+          "shipDate":{
+            "type":"string",
+            "format":"date-time"
+          },
+          "status":{
+            "description":"Order Status",
+            "type":"string",
+            "enum":[
+              "placed",
+              "approved",
+              "delivered"
+            ]
+          },
+          "complete":{
+            "type":"boolean"
+          }
+        }
+      }
+    }
+  }
+}
