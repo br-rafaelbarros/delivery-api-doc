@@ -31,3 +31,20 @@ API -->Mailer: Confirma a finalização do serviço
 </details>
 
   ![image](https://user-images.githubusercontent.com/4924002/126730780-80b2db6b-7689-4682-b0b7-1029209e7a2b.png)
+
+
+<h3>Geração de códigos</h3>
+
+**Comando de exempo para gerar client java com springframework
+```
+npx @openapitools/openapi-generator-cli generate   \
+ -i delivery-api/swagger-openapi-3.json  \
+ --api-package com.rafaelbarros.delivery.client.api  \
+ --model-package com.rafaelbarros.delivery.client.model  \
+ --invoker-package com.rafaelbarros.delivery.client.invoker  \
+ --group-id com.rafaelbarros  \
+ --artifact-id spring-swagger-codegen-api-client  \
+ --artifact-version 0.0.1-SNAPSHOT   -g java  \
+ --library resttemplate   -o spring-swagger-codegen-api-client
+
+```
