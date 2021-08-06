@@ -35,7 +35,7 @@ API -->Mailer: Confirma a finalização do serviço
 
 <h3>Geração de códigos</h3>
 
-**Comando de exempo para gerar client java com springframework
+**Comando de exempo para gerar client java com springframework**
 ```
 npx @openapitools/openapi-generator-cli generate   \
  -i delivery-api/swagger-openapi-3.json  \
@@ -47,4 +47,11 @@ npx @openapitools/openapi-generator-cli generate   \
  --artifact-version 0.0.1-SNAPSHOT   -g java  \
  --library resttemplate   -o spring-swagger-codegen-api-client
 
+```
+**Comando de exempo para gerar server em nodejs com express**
+```
+npx @openapitools/openapi-generator-cli generate \
+ -i delivery-api/swagger-openapi-3.json \
+ -g nodejs-express-server \
+ -o node-srv-delivery-api
 ```
